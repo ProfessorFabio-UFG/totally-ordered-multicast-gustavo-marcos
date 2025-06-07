@@ -33,18 +33,24 @@ def promptUser():
 	return nMsgs
 
 def startPeers(peerList,nMsgs):
-	# Connect to each of the peers and send the 'initiate' signal:
-	peerNumber = 0
-	for peer in peerList:
-		clientSock = socket(AF_INET, SOCK_STREAM)
-		clientSock.connect((peer, PEER_TCP_PORT))
-		msg = (peerNumber,nMsgs)
-		msgPack = pickle.dumps(msg)
-		clientSock.send(msgPack)
-		msgPack = clientSock.recv(512)
-		print(pickle.loads(msgPack))
-		clientSock.close()
-		peerNumber = peerNumber + 1
+    peerNumber = 0
+    for peer in peerList:
+        connected = False
+        while not connected:
+            try:
+                clientSock = socket(AF_INET, SOCK_STREAM)
+                clientSock.connect((peer, PEER_TCP_PORT))
+                msg = (peerNumber,nMsgs)
+                msgPack = pickle.dumps(msg)
+                clientSock.send(msgPack)
+                msgPack = clientSock.recv(512)
+                print(pickle.loads(msgPack))
+                clientSock.close()
+                connected = True
+            except Exception as e:
+                print(f"Tentando novamente conectar com {peer}...")
+                time.sleep(1)
+        peerNumber += 1
 
 def waitForLogsAndCompare(N_MSGS):
 	# Loop to wait for the message logs for comparison:
