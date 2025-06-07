@@ -17,12 +17,15 @@ handShakeCount = 0
 PEERS = []
 
 sendSocket = socket(AF_INET, SOCK_DGRAM)
+
 recvSocket = socket(AF_INET, SOCK_DGRAM)
 recvSocket.bind(('0.0.0.0', PEER_UDP_PORT))
 
 serverSock = socket(AF_INET, SOCK_STREAM)
+serverSock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 serverSock.bind(('0.0.0.0', PEER_TCP_PORT))
 serverSock.listen(1)
+
 
 # -------------------
 def get_public_ip():
