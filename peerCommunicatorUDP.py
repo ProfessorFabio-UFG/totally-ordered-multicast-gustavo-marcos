@@ -79,7 +79,7 @@ class MsgHandler(threading.Thread):
             msgPack, addr = self.sock.recvfrom(4096)
             msg = pickle.loads(msgPack)
 
-            if msg["type"] == "DATA":
+            if isinstance(msg, dict) and msg.get("type") == "DATA":
                 sender = msg["sender_id"]
                 timestamp = msg["timestamp"]
                 seq = msg["seq"]
@@ -99,7 +99,7 @@ class MsgHandler(threading.Thread):
                     else:
                         break
 
-            elif msg["type"] == "STOP":
+            elif isinstance(msg, dict) and msg.get("type") == "STOP":
                 stopCount += 1
                 if stopCount == N:
                     break
@@ -148,7 +148,9 @@ while True:
     for addrToSend in PEERS:
         msg = ('READY', myself)
         msgPack = pickle.dumps(msg)
-        sendSocket.sendto(msgPack, (addrToSend, PEER_UDP_PORT))
+        for _ in range(3):  # envia 3 vezes para garantir entrega
+            sendSocket.sendto(msgPack, (addrToSend, PEER_UDP_PORT))
+            time.sleep(0.05)
 
     while handShakeCount < N:
         pass
