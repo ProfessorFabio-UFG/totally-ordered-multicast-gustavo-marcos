@@ -1,9 +1,43 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/TyBiAFsA)
-# MPComm
-Very simple demo of multicast communication without coordination.
-A set of peer processes is established and each process multicasts a sequence of messages to all other processes at random intervals. Messages are stamped with the ID of the sending process and a local sequence number defined by the sending process. This is a simple attempt to demonstrate the problem of message ordering (or, in this version, the lack of it).
+# Totally Ordered Multicast using Lamport Logical Clocks
 
-The peer processes run the PeerCommunicatorUDP.py program, which has two separate threads, one for sending and the other for receiving messages. A basic handshaking protocol is used to synchronize the processes before they actually start multicasting the sequence of messages. Also, a fixed timer is set to allow plenty of time to start all processes on the participating machines. At the end, each process sends the sequence received messages to a server, which compares the sequences of messages received by all the processes to determine the number of messages received out of order (actually, the number of rounds in which at least one process received a different message form the others).
+Este projeto demonstra a implementação de um sistema de **multicast com ordenação total** de mensagens, utilizando **relógios lógicos de Lamport**, conforme a Seção 5.2.1 do livro texto.
 
+## 📚 Objetivo
 
-In order to actually see the problem, it is necessary to run the peer processes on different networks (e.g., run some of the processes in one region of the cloud, whereas the others are run on another region).
+Garantir que todas as mensagens multicast enviadas por processos distribuídos sejam entregues na **mesma ordem** para todos os membros do grupo, mesmo em uma rede com diferentes atrasos de propagação.
+
+---
+
+## 🧠 Conceitos utilizados
+
+- **Relógios Lógicos de Lamport**
+- **UDP Multicast** para envio de mensagens entre peers
+- **TCP** para controle de grupo e coleta de logs
+- **EC2 da AWS** em múltiplas regiões para simular ambiente distribuído
+
+---
+
+## 🧪 Arquitetura do sistema
+
+- **Group Manager (`GroupMngr.py`)**: registra os peers antes do início
+- **Peers (`peerCommunicatorUDP.py`)**: enviam mensagens e recebem de outros processos
+- **Servidor de comparação (`comparisonServer.py`)**: inicia a execução, coleta os logs e verifica a ordenação das mensagens
+
+---
+
+## ⚙️ Tecnologias
+
+- Python
+- EC2 AWS com Ubuntu/Amazon Linux
+
+---
+
+## 📦 Estrutura do código
+
+```bash
+.
+├── GroupMngr.py              # Gerenciador de grupo
+├── peerCommunicatorUDP.py    # Lógica de envio e recebimento de mensagens pelos peers
+├── comparisonServer.py       # Coordena a execução e coleta os logs
+├── constMP.py                # Configurações globais: IPs, portas, número de peers
+└── README.md                 # Este arquivo
